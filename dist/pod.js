@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processPod = exports.processPodspec = void 0;
+exports.processPodspec = void 0;
 const exec = __importStar(require("@actions/exec"));
 const core = __importStar(require("@actions/core"));
 function processPodspec(podspecFilename, podspecDir) {
@@ -51,16 +51,3 @@ function processPodspec(podspecFilename, podspecDir) {
     });
 }
 exports.processPodspec = processPodspec;
-function processPod(podName) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log(`Running 'pod spec cat "${podName}"'`);
-        const podspec = yield exec.getExecOutput('pod', ['spec', 'cat', podName]);
-        if (podspec.exitCode !== 0) {
-            core.error(podspec.stderr);
-            core.setFailed("'pod ipc spec' failed!");
-            throw new Error("Failed to execute 'pod ipc spec' on podfile");
-        }
-        return JSON.parse(podspec.stdout);
-    });
-}
-exports.processPod = processPod;

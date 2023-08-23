@@ -63,9 +63,7 @@ function main() {
         const [podname, dependencies] = yield (0, pod_1.processPodspec)(podspecPath, podspecDir);
         const manifest = new dependency_submission_toolkit_1.Manifest(podname, podspecPath);
         dependencies.forEach((depName) => __awaiter(this, void 0, void 0, function* () {
-            var _a;
-            const podInfo = yield (0, pod_1.processPod)(depName);
-            const packageURL = new packageurl_js_1.PackageURL('cocoapods', null, depName, (_a = podInfo.version) !== null && _a !== void 0 ? _a : null, null, null);
+            const packageURL = new packageurl_js_1.PackageURL('cocoapods', null, depName, null, null, null);
             cache.package(packageURL);
             const pkg = cache.lookupPackage(packageURL);
             if (pkg !== null) {
@@ -128,7 +126,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.processPod = exports.processPodspec = void 0;
+exports.processPodspec = void 0;
 const exec = __importStar(__nccwpck_require__(1514));
 const core = __importStar(__nccwpck_require__(2186));
 function processPodspec(podspecFilename, podspecDir) {
@@ -147,19 +145,6 @@ function processPodspec(podspecFilename, podspecDir) {
     });
 }
 exports.processPodspec = processPodspec;
-function processPod(podName) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log(`Running 'pod spec cat "${podName}"'`);
-        const podspec = yield exec.getExecOutput('pod', ['spec', 'cat', podName]);
-        if (podspec.exitCode !== 0) {
-            core.error(podspec.stderr);
-            core.setFailed("'pod ipc spec' failed!");
-            throw new Error("Failed to execute 'pod ipc spec' on podfile");
-        }
-        return JSON.parse(podspec.stdout);
-    });
-}
-exports.processPod = processPod;
 
 
 /***/ }),

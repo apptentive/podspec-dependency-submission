@@ -9,7 +9,7 @@ import {
   PackageCache
 } from '@github/dependency-submission-toolkit'
 
-import { processPodspec, processPod } from './pod'
+import { processPodspec } from './pod'
 
 import { PackageURL } from 'packageurl-js'
 
@@ -36,12 +36,11 @@ async function main () {
   const manifest = new Manifest(podname, podspecPath)
 
   dependencies.forEach(async (depName: string) => {
-    const podInfo = await processPod(depName)
     const packageURL = new PackageURL(
       'cocoapods',
       null,
       depName,
-      podInfo.version ?? null,
+      null,
       null,
       null
     )

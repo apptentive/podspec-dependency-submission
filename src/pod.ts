@@ -23,17 +23,3 @@ export async function processPodspec (
 
   return [podspec.name, Object.keys(podspec.dependencies)]
 }
-
-export async function processPod (
-  podName: string
-): Promise<Record<string, any>> {
-  console.log(`Running 'pod spec cat "${podName}"'`)
-  const podspec = await exec.getExecOutput('pod', ['spec', 'cat', podName])
-  if (podspec.exitCode !== 0) {
-    core.error(podspec.stderr)
-    core.setFailed("'pod ipc spec' failed!")
-    throw new Error("Failed to execute 'pod ipc spec' on podfile")
-  }
-
-  return JSON.parse(podspec.stdout)
-}
