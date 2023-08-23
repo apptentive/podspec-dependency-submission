@@ -1,7 +1,6 @@
-# Go Dependency Submission
+# Podspec Dependency Submission
 
-This GitHub Action calculates dependencies for a Go build-target (a Go file with a
-`main` function) and submits the list to the [Dependency submission API](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/using-the-dependency-submission-api). Dependencies then appear in your repository's dependency graph, and you'll receive Dependabot alerts and updates for vulnerable or out-of-date dependencies. 
+This GitHub Action calculates dependencies for a podspec file.
 
 ### Running locally
 
@@ -14,7 +13,7 @@ npm rebuild && npm run all
 
 ### Example
 ```yaml
-name: Go Dependency Submission
+name: Podspec Dependency Submission
 on:
   push:
     branches:
@@ -24,7 +23,7 @@ on:
 permissions:
   contents: write
 
-# Environment variables to configure Go and Go modules. Customize as necessary
+# Environment variables. Customize as necessary
 env:
   GOPROXY: '' # A Go Proxy server to be used
   GOPRIVATE: '' # A list of modules are considered private and not requested from GOPROXY

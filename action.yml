@@ -1,22 +1,14 @@
-name: 'Go Dependency Submission'
-description: 'Calculates dependencies for a Go build-target and submits the list to the Dependency Submission API'
-author: 'GitHub'
+name: 'Podspec Dependency Submission'
+description: 'Calculates dependencies for a project that contains a file and submits the list to the Dependency Submission API'
+author: 'frankus'
 inputs:
   token:
     description: "GitHub Personal Access Token (PAT). Defaults to PAT provided by Action runner"
     required: false
     default: ${{ github.token }}
-  metadata:
-    required: false
-    description: 'User provided map of max key/value pairs of metadata to include with the snapshot e.g. {"lastModified": "12-31-2022"}'
-  go-mod-path:
+  podspec-path:
     required: true
-    description: 'Repo path to the go.mod file used to detect dependencies for the Go build target. Defaults to go.mod in the root of the repository.'
-    default: 'go.mod'
-  go-build-target:
-    required: true
-    description: 'Build target to detect build dependencies. If unspecified, will use "all", with will detect all dependencies used in all build targets (including tests and tools).'
-    default: 'all'
+    description: 'Repo path to the podspec file used to detect dependencies for the project.'
 runs:
   using: 'node16'
   main: 'dist/index.js'

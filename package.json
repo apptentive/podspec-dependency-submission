@@ -18,7 +18,7 @@
     "url": "git+https://github.com/apptentive/podspec-dependency-submission.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "frankus",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/apptentive/podspec-dependency-submission/issues"
