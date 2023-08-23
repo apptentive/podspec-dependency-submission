@@ -5,87 +5,67 @@ import * as github from '@actions/github'
 import {
   Snapshot,
   Manifest,
-  submitSnapshot
+  submitSnapshot,
+  PackageCache
 } from '@github/dependency-submission-toolkit'
 
-import {
-  processGoGraph,
-  processGoDirectDependencies,
-  processGoIndirectDependencies
-} from './process'
+import { processPodspec, processPod } from './pod'
+
+import { PackageURL } from 'packageurl-js'
+
+const packageJson = require('../package')
+const cache = new PackageCache()
 
 async function main () {
-  const goModPath = path.normalize(
-    core.getInput('go-mod-path', { required: true })
+  const podspecPath = path.normalize(
+    core.getInput('podspec-path', { required: true })
   )
 
-  if (path.basename(goModPath) !== 'go.mod' || !fs.existsSync(goModPath)) {
-    throw new Error(`${goModPath} is not a go.mod file or does not exist!`)
-  }
-  const goModDir = path.dirname(goModPath)
-
-  let goBuildTarget = core.getInput('go-build-target')
-
-  if (goBuildTarget !== 'all' && goBuildTarget !== './...') {
-    if (!fs.existsSync(goBuildTarget)) {
-      throw new Error(`The build target '${goBuildTarget}' does not exist`)
-    }
-    if (goModDir !== '.') {
-      if (goBuildTarget.startsWith(goModDir)) {
-        goBuildTarget = goBuildTarget.replace(goModDir, '')
-        goBuildTarget = goBuildTarget.startsWith('/')
-          ? goBuildTarget.substring(1)
-          : goBuildTarget
-      } else {
-        throw new Error(
-          `The build target ${goBuildTarget} is not a sub-directory of ${goModDir}`
-        )
-      }
-    }
+  if (
+    !path.basename(podspecPath).endsWith('.podspec') ||
+    !fs.existsSync(podspecPath)
+  ) {
+    throw new Error(`${podspecPath} is not a podspec file or does not exist!`)
   }
 
-  const directDeps = await processGoDirectDependencies(goModDir, goBuildTarget)
-  const indirectDeps = await processGoIndirectDependencies(
-    goModDir,
-    goBuildTarget
-  )
-  const packageCache = await processGoGraph(goModDir, directDeps, indirectDeps)
-  // if using the pseudotargets "all" or "./...", use the path to go.mod as filepath
-  const filepath =
-    goBuildTarget === 'all' || goBuildTarget === './...'
-      ? goModPath
-      : path.join(goModDir, goBuildTarget)
-  const manifest = new Manifest(goBuildTarget, filepath)
+  const podspecDir = path.dirname(podspecPath)
 
-  directDeps.forEach((pkgUrl) => {
-    const dep = packageCache.lookupPackage(pkgUrl)
-    if (!dep) {
-      throw new Error(
-        'assertion failed: expected all direct dependencies to have entries in PackageCache'
-      )
-    }
-    manifest.addDirectDependency(dep)
-  })
+  // Get pod name from podspec
+  const podspec = await processPodspec(podspecPath, podspecDir)
 
-  indirectDeps.forEach((pkgUrl) => {
-    const dep = packageCache.lookupPackage(pkgUrl)
-    if (!dep) {
-      throw new Error(
-        'assertion failed: expected all indirect dependencies to have entries in PackageCache'
-      )
+  const manifest = new Manifest(podspec.name, podspecPath)
+
+  podspec.dependencies.entries().forEach(async (depName: string) => {
+    const podInfo = await processPod(depName)
+    const packageURL = new PackageURL(
+      'cocoapods',
+      null,
+      depName,
+      podInfo.version ?? null,
+      null,
+      null
+    )
+
+    cache.package(packageURL)
+
+    const pkg = cache.lookupPackage(packageURL)
+
+    if (pkg !== null) {
+      manifest.addDirectDependency(pkg!)
     }
-    manifest.addIndirectDependency(dep)
+
+    // TODO: if podInfo has dependencies, recursively add them as transitive dependencies
   })
 
   const snapshot = new Snapshot(
     {
-      name: 'actions/go-dependency-submission',
-      url: 'https://github.com/actions/go-dependency-submission',
-      version: '0.0.1'
+      name: packageJson.name,
+      url: 'https://github.com/apptentive/podspec-dependency-submission',
+      version: packageJson.version
     },
     github.context,
     {
-      correlator: `${github.context.job}-${goBuildTarget}`,
+      correlator: `${github.context.job}-${podspec.name}`,
       id: github.context.runId.toString()
     }
   )
