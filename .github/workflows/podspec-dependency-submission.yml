@@ -18,7 +18,6 @@ jobs:
       - name: Set up CocoaPods
         run: |
           sudo gem install cocoapods
-          pod repo update
 
       - name: Run snapshot action
         uses: actions/go-dependency-submission@v1
