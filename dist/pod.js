@@ -47,15 +47,13 @@ function processPodspec(podspecFilename, podspecDir) {
             throw new Error("Failed to execute 'pod ipc spec' on podfile");
         }
         const podspec = JSON.parse(podspecOutput.stdout);
-        const dependencies = Object.keys(podspec.dependencies);
-        console.log(dependencies);
-        return [podspec.name, dependencies];
+        return [podspec.name, Object.keys(podspec.dependencies)];
     });
 }
 exports.processPodspec = processPodspec;
 function processPod(podName) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(`Running 'pod ipc spec "${podName}"'`);
+        console.log(`Running 'pod spec cat "${podName}"'`);
         const podspec = yield exec.getExecOutput('pod', ['spec', 'cat', podName]);
         if (podspec.exitCode !== 0) {
             core.error(podspec.stderr);
