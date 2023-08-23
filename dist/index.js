@@ -60,9 +60,9 @@ function main() {
         }
         const podspecDir = path_1.default.dirname(podspecPath);
         // Get pod name from podspec
-        const podspec = yield (0, pod_1.processPodspec)(podspecPath, podspecDir);
-        const manifest = new dependency_submission_toolkit_1.Manifest(podspec.name, podspecPath);
-        podspec.dependencies.entries().forEach((depName) => __awaiter(this, void 0, void 0, function* () {
+        const [podname, dependencies] = yield (0, pod_1.processPodspec)(podspecPath, podspecDir);
+        const manifest = new dependency_submission_toolkit_1.Manifest(podname, podspecPath);
+        dependencies.forEach((depName) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             const podInfo = yield (0, pod_1.processPod)(depName);
             const packageURL = new packageurl_js_1.PackageURL('cocoapods', null, depName, (_a = podInfo.version) !== null && _a !== void 0 ? _a : null, null, null);
@@ -78,7 +78,7 @@ function main() {
             url: 'https://github.com/apptentive/podspec-dependency-submission',
             version: packageJson.version
         }, github.context, {
-            correlator: `${github.context.job}-${podspec.name}`,
+            correlator: `${github.context.job}-${podname}`,
             id: github.context.runId.toString()
         });
         snapshot.addManifest(manifest);
@@ -134,15 +134,18 @@ const core = __importStar(__nccwpck_require__(2186));
 function processPodspec(podspecFilename, podspecDir) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`Running 'pod ipc spec "${podspecFilename}"' in ${podspecDir}`);
-        const podspec = yield exec.getExecOutput('pod', ['ipc', 'spec', podspecFilename], {
+        const podspecOutput = yield exec.getExecOutput('pod', ['ipc', 'spec', podspecFilename], {
             cwd: podspecDir
         });
-        if (podspec.exitCode !== 0) {
-            core.error(podspec.stderr);
+        if (podspecOutput.exitCode !== 0) {
+            core.error(podspecOutput.stderr);
             core.setFailed("'pod ipc spec' failed!");
             throw new Error("Failed to execute 'pod ipc spec' on podfile");
         }
-        return JSON.parse(podspec.stdout);
+        const podspec = JSON.parse(podspecOutput.stdout);
+        const dependencies = Object.keys(podspec.dependencies);
+        console.log(dependencies);
+        return [podspec.name, dependencies];
     });
 }
 exports.processPodspec = processPodspec;

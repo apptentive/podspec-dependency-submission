@@ -38,15 +38,18 @@ const core = __importStar(require("@actions/core"));
 function processPodspec(podspecFilename, podspecDir) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`Running 'pod ipc spec "${podspecFilename}"' in ${podspecDir}`);
-        const podspec = yield exec.getExecOutput('pod', ['ipc', 'spec', podspecFilename], {
+        const podspecOutput = yield exec.getExecOutput('pod', ['ipc', 'spec', podspecFilename], {
             cwd: podspecDir
         });
-        if (podspec.exitCode !== 0) {
-            core.error(podspec.stderr);
+        if (podspecOutput.exitCode !== 0) {
+            core.error(podspecOutput.stderr);
             core.setFailed("'pod ipc spec' failed!");
             throw new Error("Failed to execute 'pod ipc spec' on podfile");
         }
-        return JSON.parse(podspec.stdout);
+        const podspec = JSON.parse(podspecOutput.stdout);
+        const dependencies = Object.keys(podspec.dependencies);
+        console.log(dependencies);
+        return [podspec.name, dependencies];
     });
 }
 exports.processPodspec = processPodspec;

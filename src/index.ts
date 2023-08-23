@@ -31,11 +31,11 @@ async function main () {
   const podspecDir = path.dirname(podspecPath)
 
   // Get pod name from podspec
-  const podspec = await processPodspec(podspecPath, podspecDir)
+  const [podname, dependencies] = await processPodspec(podspecPath, podspecDir)
 
-  const manifest = new Manifest(podspec.name, podspecPath)
+  const manifest = new Manifest(podname, podspecPath)
 
-  podspec.dependencies.entries().forEach(async (depName: string) => {
+  dependencies.forEach(async (depName: string) => {
     const podInfo = await processPod(depName)
     const packageURL = new PackageURL(
       'cocoapods',
@@ -65,7 +65,7 @@ async function main () {
     },
     github.context,
     {
-      correlator: `${github.context.job}-${podspec.name}`,
+      correlator: `${github.context.job}-${podname}`,
       id: github.context.runId.toString()
     }
   )

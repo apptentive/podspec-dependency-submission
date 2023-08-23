@@ -4,22 +4,24 @@ import * as core from '@actions/core'
 export async function processPodspec (
   podspecFilename: string,
   podspecDir: string
-): Promise<Record<string, any>> {
+): Promise<[string, string[]]> {
   console.log(`Running 'pod ipc spec "${podspecFilename}"' in ${podspecDir}`)
-  const podspec = await exec.getExecOutput(
+  const podspecOutput = await exec.getExecOutput(
     'pod',
     ['ipc', 'spec', podspecFilename],
     {
       cwd: podspecDir
     }
   )
-  if (podspec.exitCode !== 0) {
-    core.error(podspec.stderr)
+  if (podspecOutput.exitCode !== 0) {
+    core.error(podspecOutput.stderr)
     core.setFailed("'pod ipc spec' failed!")
     throw new Error("Failed to execute 'pod ipc spec' on podfile")
   }
 
-  return JSON.parse(podspec.stdout)
+  const podspec = JSON.parse(podspecOutput.stdout)
+
+  return [podspec.name, Object.keys(podspec.dependencies)]
 }
 
 export async function processPod (
