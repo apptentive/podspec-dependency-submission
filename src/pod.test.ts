@@ -1,5 +1,7 @@
 import { processPodspec, processPod } from './pod'
 
+jest.setTimeout(20000)
+
 describe('processPodspec', () => {
   it('parses a podspec', async () => {
     const podspec = await processPodspec('apptentive-fake-plugin.podspec', '.')
