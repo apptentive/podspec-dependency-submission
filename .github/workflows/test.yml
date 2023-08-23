@@ -27,6 +27,7 @@ jobs:
       - name: Set up CocoaPods
         run: |
           sudo gem install cocoapods
+          pod repo update
 
       - name: Build and run tests 
         run: npm rebuild && npm run all
