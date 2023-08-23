@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  go-action-detection:
+  podspec-action-detection:
     runs-on: macos-latest
     steps:
       - name: 'Checkout Repository'
@@ -20,6 +20,6 @@ jobs:
           sudo gem install cocoapods
 
       - name: Run snapshot action
-        uses: actions/go-dependency-submission@v1
+        uses: apptentive/podspec-dependency-submission@v0.0.1
         with:
           podspec-path: apptentive-fake-plugin.podspec
