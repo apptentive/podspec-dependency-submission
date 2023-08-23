@@ -20,6 +20,6 @@ jobs:
           sudo gem install cocoapods
 
       - name: Run snapshot action
-        uses: apptentive/podspec-dependency-submission@v0.0.1
+        uses: apptentive/podspec-dependency-submission@v0
         with:
           podspec-path: apptentive-fake-plugin.podspec
