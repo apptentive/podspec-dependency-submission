@@ -18,6 +18,7 @@ jobs:
       - name: Set up CocoaPods
         run: |
           sudo gem install cocoapods
+          pod repo update
 
       - name: Run snapshot action
         uses: apptentive/podspec-dependency-submission@v0
