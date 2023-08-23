@@ -1,6 +1,6 @@
 {
   "name": "podspec-dependency-submission",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Podspec Dependency Submission",
   "main": "dist/index.js",
   "scripts": {
